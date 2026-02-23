@@ -1,10 +1,10 @@
 {
-  "name": "@swimlane/ngx-charts",
-  "version": "23.1.0",
+  "name": "@wbds/ngx-charts",
+  "version": "24.0.0",
   "description": "Declarative Charting Framework for Angular",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swimlane/ngx-charts.git"
+    "url": "git+https://github.com/weisenburger/ngx-charts.git"
   },
   "keywords": [
     "angular",
@@ -23,12 +23,12 @@
     "viz",
     "graph"
   ],
-  "author": "Swimlane",
+  "author": "weisenburger",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/swimlane/ngx-charts/issues"
+    "url": "https://github.com/weisenburger/ngx-charts/issues"
   },
-  "homepage": "https://github.com/swimlane/ngx-charts#readme",
+  "homepage": "https://github.com/weisenburger/ngx-charts#readme",
   "peerDependencies": {
     "@angular/animations": "18.x || 19.x || 20.x || 21.x",
     "@angular/cdk": "18.x || 19.x || 20.x || 21.x",

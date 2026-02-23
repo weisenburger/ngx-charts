@@ -12,9 +12,9 @@ import {
 import { trigger, style, animate, transition } from '@angular/animations';
 import { scaleLinear } from 'd3-scale';
 
-import { getDomain, getScale } from '@swimlane/ngx-charts/bubble-chart/bubble-chart.utils';
-import { getScaleType } from '@swimlane/ngx-charts/common/domain.helper';
-import { id } from '@swimlane/ngx-charts//utils/id';
+import { getDomain, getScale } from '@wbds/ngx-charts/bubble-chart/bubble-chart.utils';
+import { getScaleType } from '@wbds/ngx-charts/common/domain.helper';
+import { id } from '@wbds/ngx-charts//utils/id';
 import {
   ViewDimensions,
   ColorHelper,

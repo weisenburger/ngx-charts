@@ -6,7 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { boxData } from '../../../../../../src/app/data';
 import { BoxChartModule } from './box-chart.module';
 import { cloneLineCoordinates } from './box.component';
-import { IVector2D } from '@swimlane/ngx-charts/models/coordinates.model';
+import { IVector2D } from '@wbds/ngx-charts/models/coordinates.model';
 
 @Component({
   selector: 'test-component',
