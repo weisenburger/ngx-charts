@@ -100,10 +100,6 @@ export class ComboChartComponent extends BaseChartComponent {
   bandwidth;
   barPadding = 8;
 
-  trackBy(index, item): string {
-    return `${item.name}`;
-  }
-
   update(): void {
     super.update();
     this.dims = calculateViewDimensions({
