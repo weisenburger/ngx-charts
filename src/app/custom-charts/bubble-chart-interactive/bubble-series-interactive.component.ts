@@ -9,9 +9,9 @@ import {
   TemplateRef
 } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
-import { formatLabel } from '@swimlane/ngx-charts/common/label.helper';
-import { PlacementTypes } from '@swimlane/ngx-charts/common/tooltip/position';
-import { StyleTypes } from '@swimlane/ngx-charts/common/tooltip/style.type';
+import { formatLabel } from '@wbds/ngx-charts/common/label.helper';
+import { PlacementTypes } from '@wbds/ngx-charts/common/tooltip/position';
+import { StyleTypes } from '@wbds/ngx-charts/common/tooltip/style.type';
 
 @Component({
   // tslint:disable-next-line: component-selector

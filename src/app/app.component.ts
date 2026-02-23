@@ -3,8 +3,8 @@ import { Location, LocationStrategy, HashLocationStrategy } from '@angular/commo
 import * as shape from 'd3-shape';
 import * as d3Array from 'd3-array';
 
-import { Color, colorSets } from '@swimlane/ngx-charts/utils/color-sets';
-import { formatLabel, escapeLabel } from '@swimlane/ngx-charts/common/label.helper';
+import { Color, colorSets } from '@wbds/ngx-charts/utils/color-sets';
+import { formatLabel, escapeLabel } from '@wbds/ngx-charts/common/label.helper';
 import {
   single,
   multi,
@@ -24,8 +24,8 @@ import chartGroups from './chartTypes';
 import { barChart, lineChartSeries } from './combo-chart-data';
 import pkg from '../../projects/swimlane/ngx-charts/package.json';
 import { InputTypes } from '@swimlane/ngx-ui';
-import { LegendPosition } from '@swimlane/ngx-charts/common/types/legend.model';
-import { ScaleType } from '@swimlane/ngx-charts/common/types/scale-type.enum';
+import { LegendPosition } from '@wbds/ngx-charts/common/types/legend.model';
+import { ScaleType } from '@wbds/ngx-charts/common/types/scale-type.enum';
 
 const monthName = new Intl.DateTimeFormat('en-us', { month: 'short' });
 const weekdayName = new Intl.DateTimeFormat('en-us', { weekday: 'short' });

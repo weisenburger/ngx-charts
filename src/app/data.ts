@@ -7,7 +7,7 @@ import {
   Series,
   TreeMapData,
   SankeyData
-} from '@swimlane/ngx-charts/models/chart-data.model';
+} from '@wbds/ngx-charts/models/chart-data.model';
 
 export const single: SingleSeries = [
   {
