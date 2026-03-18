@@ -1,4 +1,4 @@
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 import {
   Component,
   Input,
@@ -21,6 +21,8 @@ import { roundedRect } from '../../common/shape.helper';
 
 @Component({
   selector: 'g[ngx-charts-x-axis-ticks]',
+  imports: [NgTemplateOutlet],
+  standalone: true,
   template: `
     <svg:g #ticksel>
       @for (tick of ticks; track tick) {
@@ -95,8 +97,7 @@ import { roundedRect } from '../../common/shape.helper';
       </svg:g>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class XAxisTicksComponent implements OnChanges, AfterViewInit {
   @Input() scale;

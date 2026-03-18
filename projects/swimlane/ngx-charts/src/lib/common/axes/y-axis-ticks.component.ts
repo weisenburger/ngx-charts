@@ -15,12 +15,14 @@ import {
 import { trimLabel } from '../trim-label.helper';
 import { getTickLines, reduceTicks } from './ticks.helper';
 import { roundedRect } from '../../common/shape.helper';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 import { Orientation } from '../types/orientation.enum';
 import { TextAnchor } from '../types/text-anchor.enum';
 
 @Component({
   selector: 'g[ngx-charts-y-axis-ticks]',
+  imports: [NgTemplateOutlet],
+  standalone: true,
   template: `
     <svg:g #ticksel>
       @for (tick of ticks; track tick) {
@@ -109,8 +111,7 @@ import { TextAnchor } from '../types/text-anchor.enum';
       </svg:g>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class YAxisTicksComponent implements OnChanges, AfterViewInit {
   @Input() scale;

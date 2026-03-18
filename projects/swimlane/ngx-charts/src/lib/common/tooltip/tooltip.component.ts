@@ -17,10 +17,12 @@ import { throttleable } from '../../utils/throttle';
 import { PositionHelper, PlacementTypes } from './position';
 
 import { StyleTypes } from './style.type';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'ngx-tooltip-content',
+  imports: [NgTemplateOutlet],
+  standalone: true,
   template: `
     <div>
       <span #caretElm [hidden]="!showCaret" class="tooltip-caret position-{{ this.placement }}"> </span>
@@ -36,8 +38,7 @@ import { isPlatformBrowser } from '@angular/common';
     </div>
   `,
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./tooltip.component.scss'],
-  standalone: false
+  styleUrls: ['./tooltip.component.scss']
 })
 export class TooltipContentComponent implements AfterViewInit {
   @Input() host: ElementRef;

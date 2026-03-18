@@ -8,9 +8,9 @@ import { TooltipService } from './tooltip.service';
 import { InjectionService } from './injection.service';
 
 @NgModule({
-  declarations: [TooltipContentComponent, TooltipDirective],
+  declarations: [TooltipDirective],
   providers: [InjectionService, TooltipService],
   exports: [TooltipContentComponent, TooltipDirective],
-  imports: [CommonModule]
+  imports: [CommonModule, TooltipContentComponent]
 })
 export class TooltipModule {}

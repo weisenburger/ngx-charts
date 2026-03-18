@@ -15,6 +15,21 @@ import { ngxChartsPolyfills } from './polyfills';
 import { SankeyModule } from './sankey/sankey.module';
 
 @NgModule({
+  imports: [
+    ChartCommonModule,
+    AreaChartModule,
+    BarChartModule,
+    BoxChartModule,
+    BubbleChartModule,
+    HeatMapModule,
+    SankeyModule,
+    LineChartModule,
+    PolarChartModule,
+    NumberCardModule,
+    PieChartModule,
+    TreeMapModule,
+    GaugeModule
+  ],
   exports: [
     ChartCommonModule,
     AreaChartModule,

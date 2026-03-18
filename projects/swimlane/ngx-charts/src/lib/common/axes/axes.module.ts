@@ -7,8 +7,8 @@ import { YAxisTicksComponent } from './y-axis-ticks.component';
 import { CommonModule } from '@angular/common';
 
 @NgModule({
-  imports: [CommonModule],
-  declarations: [AxisLabelComponent, XAxisComponent, XAxisTicksComponent, YAxisComponent, YAxisTicksComponent],
+  imports: [CommonModule, XAxisTicksComponent, YAxisTicksComponent],
+  declarations: [AxisLabelComponent, XAxisComponent, YAxisComponent],
   exports: [AxisLabelComponent, XAxisComponent, XAxisTicksComponent, YAxisComponent, YAxisTicksComponent]
 })
 export class AxesModule {}
