@@ -22,7 +22,6 @@ import { roundedRect } from '../../common/shape.helper';
 @Component({
   selector: 'g[ngx-charts-x-axis-ticks]',
   imports: [NgTemplateOutlet],
-  standalone: true,
   template: `
     <svg:g #ticksel>
       @for (tick of ticks; track tick) {

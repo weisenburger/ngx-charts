@@ -22,7 +22,6 @@ import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 @Component({
   selector: 'ngx-tooltip-content',
   imports: [NgTemplateOutlet],
-  standalone: true,
   template: `
     <div>
       <span #caretElm [hidden]="!showCaret" class="tooltip-caret position-{{ this.placement }}"> </span>

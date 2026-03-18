@@ -22,7 +22,6 @@ import { TextAnchor } from '../types/text-anchor.enum';
 @Component({
   selector: 'g[ngx-charts-y-axis-ticks]',
   imports: [NgTemplateOutlet],
-  standalone: true,
   template: `
     <svg:g #ticksel>
       @for (tick of ticks; track tick) {
