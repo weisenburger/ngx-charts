@@ -1,4 +1,4 @@
-import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   Input,
@@ -21,7 +21,6 @@ import { roundedRect } from '../../common/shape.helper';
 
 @Component({
   selector: 'g[ngx-charts-x-axis-ticks]',
-  imports: [NgTemplateOutlet],
   template: `
     <svg:g #ticksel>
       @for (tick of ticks; track tick) {
@@ -36,25 +35,17 @@ import { roundedRect } from '../../common/shape.helper';
                 [attr.transform]="textTransform"
               >
                 @if (isWrapTicksSupported) {
-                  <ng-template [ngTemplateOutlet]="tmplMultilineTick"></ng-template>
-                } @else {
-                  <ng-template [ngTemplateOutlet]="tmplSinglelineTick"></ng-template>
-                }
-              </svg:text>
-              <ng-template #tmplMultilineTick>
-                @if (tickChunks(tick); as tickLines) {
-                  <ng-container>
+                  @if (tickChunks(tick); as tickLines) {
                     @for (tickLine of tickLines; track tickLine; let i = $index) {
                       <svg:tspan x="0" [attr.y]="i * 12">
                         {{ tickLine }}
                       </svg:tspan>
                     }
-                  </ng-container>
+                  }
+                } @else {
+                  {{ tickTrim(tickFormatted) }}
                 }
-              </ng-template>
-              <ng-template #tmplSinglelineTick>
-                {{ tickTrim(tickFormatted) }}
-              </ng-template>
+              </svg:text>
             </ng-container>
           }
         </svg:g>
