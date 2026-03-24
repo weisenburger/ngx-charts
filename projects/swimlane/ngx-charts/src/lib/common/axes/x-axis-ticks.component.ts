@@ -35,25 +35,17 @@ import { roundedRect } from '../../common/shape.helper';
                 [attr.transform]="textTransform"
               >
                 @if (isWrapTicksSupported) {
-                  <ng-template [ngTemplateOutlet]="tmplMultilineTick"></ng-template>
-                } @else {
-                  <ng-template [ngTemplateOutlet]="tmplSinglelineTick"></ng-template>
-                }
-              </svg:text>
-              <ng-template #tmplMultilineTick>
-                @if (tickChunks(tick); as tickLines) {
-                  <ng-container>
+                  @if (tickChunks(tick); as tickLines) {
                     @for (tickLine of tickLines; track tickLine; let i = $index) {
                       <svg:tspan x="0" [attr.y]="i * 12">
                         {{ tickLine }}
                       </svg:tspan>
                     }
-                  </ng-container>
+                  }
+                } @else {
+                  {{ tickTrim(tickFormatted) }}
                 }
-              </ng-template>
-              <ng-template #tmplSinglelineTick>
-                {{ tickTrim(tickFormatted) }}
-              </ng-template>
+              </svg:text>
             </ng-container>
           }
         </svg:g>
@@ -95,8 +87,7 @@ import { roundedRect } from '../../common/shape.helper';
       </svg:g>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class XAxisTicksComponent implements OnChanges, AfterViewInit {
   @Input() scale;

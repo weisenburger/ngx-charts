@@ -37,31 +37,21 @@ import { TextAnchor } from '../types/text-anchor.enum';
                 [style.font-size]="'12px'"
               >
                 @if (wrapTicks) {
-                  <ng-template [ngTemplateOutlet]="tmplMultilineTick"></ng-template>
+                  @if (tickChunks(tick); as tickLines) {
+                    @if (tickLines.length > 1) {
+                      @for (tickLine of tickLines; track tickLine; let i = $index) {
+                        <svg:tspan x="0" [attr.y]="i * (8 + tickSpacing)">
+                          {{ tickLine }}
+                        </svg:tspan>
+                      }
+                    } @else {
+                      {{ tickTrim(tickFormatted) }}
+                    }
+                  }
                 } @else {
-                  <ng-template [ngTemplateOutlet]="tmplSinglelineTick"></ng-template>
+                  {{ tickTrim(tickFormatted) }}
                 }
               </svg:text>
-              <ng-template #tmplMultilineTick>
-                @if (tickChunks(tick); as tickLines) {
-                  <ng-container>
-                    @if (tickLines.length > 1) {
-                      <ng-container>
-                        @for (tickLine of tickLines; track tickLine; let i = $index) {
-                          <svg:tspan x="0" [attr.y]="i * (8 + tickSpacing)">
-                            {{ tickLine }}
-                          </svg:tspan>
-                        }
-                      </ng-container>
-                    } @else {
-                      <ng-template [ngTemplateOutlet]="tmplSinglelineTick"></ng-template>
-                    }
-                  </ng-container>
-                }
-              </ng-template>
-              <ng-template #tmplSinglelineTick>
-                {{ tickTrim(tickFormatted) }}
-              </ng-template>
             </ng-container>
           }
         </svg:g>
@@ -109,8 +99,7 @@ import { TextAnchor } from '../types/text-anchor.enum';
       </svg:g>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class YAxisTicksComponent implements OnChanges, AfterViewInit {
   @Input() scale;
