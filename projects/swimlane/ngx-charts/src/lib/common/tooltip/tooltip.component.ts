@@ -1,5 +1,6 @@
 import {
   Input,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   AfterViewInit,
@@ -65,6 +66,7 @@ export class TooltipContentComponent implements AfterViewInit {
   constructor(
     public element: ElementRef,
     private renderer: Renderer2,
+    private changeDetectorRef: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
 
@@ -118,7 +120,15 @@ export class TooltipContentComponent implements AfterViewInit {
   }
 
   checkFlip(hostDim: DOMRect, elmDim: DOMRect): void {
-    this.placement = PositionHelper.determinePlacement(this.placement, elmDim, hostDim, this.spacing);
+    const placement = PositionHelper.determinePlacement(this.placement, elmDim, hostDim, this.spacing);
+
+    if (placement === this.placement) {
+      return;
+    }
+
+    this.placement = placement;
+    // `position()` runs in a timeout, so the host class binding has to be re-evaluated explicitly
+    this.changeDetectorRef.markForCheck();
   }
 
   @HostListener('window:resize')
