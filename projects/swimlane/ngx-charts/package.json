@@ -1,6 +1,6 @@
 {
   "name": "@wbds/ngx-charts",
-  "version": "25.0.2",
+  "version": "25.0.0-rc.0",
   "description": "Declarative Charting Framework for Angular",
   "repository": {
     "type": "git",
