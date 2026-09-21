@@ -16,7 +16,6 @@
     "test:ci": "ng test @wbds/ngx-charts --watch=false --progress=false --browsers=ChromeHeadlessCI",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "predeploy": "npm run build:demo",
     "package": "run-s build:lib:prod copy-files",
     "prepublish:lib": "npm run package",
     "publish:lib": "npm publish ./dist/wbds/ngx-charts --access public",

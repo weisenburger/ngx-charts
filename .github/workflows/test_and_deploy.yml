@@ -1,4 +1,4 @@
-name: Build, Test, and Deploy
+name: Build and Test
 
 on: [push]
 jobs:
@@ -34,11 +34,3 @@ jobs:
           yarn ci
         env:
           CI: true
-
-      - name: Prepare and deploy
-        run: |
-          npm run deploy -- --name="Swimlane" --email="swimlane-devops@swimlane.com"
-        if: ${{ github.ref == 'refs/heads/master' }}
-        env:
-          CI: true
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
