@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { multi } from '../../../../../../src/app/data';
@@ -7,12 +7,17 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { NumberCardModule } from './number-card.module';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
+vi.setConfig({ testTimeout: 30000, hookTimeout: 30000 });
 
 @Component({
   selector: 'test-component',
-  template: '',
-  standalone: false
+  template: `
+    <ngx-charts-number-card [animations]="false" [view]="[400, 800]" [scheme]="colorScheme" [results]="multi">
+    </ngx-charts-number-card>
+  `,
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- preserve pre-Angular-22 Default CD behavior
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [NumberCardModule]
 })
 class TestComponent {
   multi: any = multi;
@@ -24,27 +29,12 @@ class TestComponent {
 describe('<ngx-charts-number-card>', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent],
-      imports: [NoopAnimationsModule, NumberCardModule],
+      imports: [NoopAnimationsModule, TestComponent],
       providers: [{ provide: APP_BASE_HREF, useValue: '/' }]
     });
   });
 
   describe('basic setup', () => {
-    beforeEach(() => {
-      TestBed.overrideComponent(TestComponent, {
-        set: {
-          template: `
-              <ngx-charts-number-card
-                [animations]="false"
-                [view]="[400,800]"
-                [scheme]="colorScheme"
-                [results]="multi">
-              </ngx-charts-number-card>`
-        }
-      }).compileComponents();
-    });
-
     it('should set the svg width and height', () => {
       const fixture = TestBed.createComponent(TestComponent);
       fixture.detectChanges();

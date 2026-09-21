@@ -1,13 +1,19 @@
 import { TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ChartCommonModule } from '../chart-common.module';
 
 @Component({
   selector: 'test-component',
-  template: '',
-  standalone: false
+  template: `
+    <ngx-charts-chart [animations]="false" [view]="[400, 800]">
+      <p>ngx-charts is cool!</p>
+    </ngx-charts-chart>
+  `,
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- preserve pre-Angular-22 Default CD behavior
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [ChartCommonModule]
 })
 class TestComponent {
   barData: any;
@@ -16,27 +22,11 @@ class TestComponent {
 describe('<ngx-charts-chart>', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent],
-      imports: [NoopAnimationsModule, ChartCommonModule]
+      imports: [NoopAnimationsModule, TestComponent]
     });
   });
 
   describe('basic setup', () => {
-    beforeEach(() => {
-      // set up a  basic chart
-      TestBed.overrideComponent(TestComponent, {
-        set: {
-          template: `
-                    <ngx-charts-chart
-                      [animations]="false"
-                      [view]="[400,800]">
-                      <p>ngx-charts is cool!</p>
-                    </ngx-charts-chart>
-                `
-        }
-      }).compileComponents();
-    });
-
     it('should set the svg width and height', () => {
       const fixture = TestBed.createComponent(TestComponent);
       fixture.detectChanges();

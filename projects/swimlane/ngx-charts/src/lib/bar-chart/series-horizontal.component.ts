@@ -1,5 +1,17 @@
-import { Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy, TemplateRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  OnInit,
+  ChangeDetectionStrategy,
+  TemplateRef,
+  PLATFORM_ID,
+  Inject
+} from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
+import { isPlatformServer } from '@angular/common';
 import { formatLabel, escapeLabel } from '../common/label.helper';
 import { DataItem, StringOrNumberOrDate } from '../models/chart-data.model';
 import { ColorHelper } from '../common/color.helper';
@@ -15,35 +27,71 @@ import { ScaleType } from '../common/types/scale-type.enum';
 @Component({
   selector: 'g[ngx-charts-series-horizontal]',
   template: `
-    @for (bar of bars; track bar.label) {
-      <svg:g
-        ngx-charts-bar
-        [@animationState]="'active'"
-        [width]="bar.width"
-        [height]="bar.height"
-        [x]="bar.x"
-        [y]="bar.y"
-        [fill]="bar.color"
-        [stops]="bar.gradientStops"
-        [data]="bar.data"
-        [orientation]="barOrientation.Horizontal"
-        [roundEdges]="bar.roundEdges"
-        (select)="click($event)"
-        [gradient]="gradient"
-        [isActive]="isActive(bar.data)"
-        [ariaLabel]="bar.ariaLabel"
-        [animations]="animations"
-        (activate)="activate.emit($event)"
-        (deactivate)="deactivate.emit($event)"
-        ngx-tooltip
-        [tooltipDisabled]="tooltipDisabled"
-        [tooltipPlacement]="tooltipPlacement"
-        [tooltipType]="tooltipType"
-        [tooltipTitle]="tooltipTemplate ? undefined : bar.tooltipText"
-        [tooltipTemplate]="tooltipTemplate"
-        [tooltipContext]="bar.data"
-        [noBarWhenZero]="noBarWhenZero"
-      ></svg:g>
+    @if (!isSSR) {
+      <svg:g>
+        @for (bar of bars; track bar.label) {
+          <svg:g
+            ngx-charts-bar
+            [@animationState]="'active'"
+            [width]="bar.width"
+            [height]="bar.height"
+            [x]="bar.x"
+            [y]="bar.y"
+            [fill]="bar.color"
+            [stops]="bar.gradientStops"
+            [data]="bar.data"
+            [orientation]="barOrientation.Horizontal"
+            [roundEdges]="bar.roundEdges"
+            (select)="click($event)"
+            [gradient]="gradient"
+            [isActive]="isActive(bar.data)"
+            [ariaLabel]="bar.ariaLabel"
+            [animations]="animations"
+            (activate)="activate.emit($event)"
+            (deactivate)="deactivate.emit($event)"
+            ngx-tooltip
+            [tooltipDisabled]="tooltipDisabled"
+            [tooltipPlacement]="tooltipPlacement"
+            [tooltipType]="tooltipType"
+            [tooltipTitle]="tooltipTemplate ? undefined : bar.tooltipText"
+            [tooltipTemplate]="tooltipTemplate"
+            [tooltipContext]="bar.data"
+            [noBarWhenZero]="noBarWhenZero"
+          ></svg:g>
+        }
+      </svg:g>
+    } @else {
+      <svg:g>
+        @for (bar of bars; track bar.label) {
+          <svg:g
+            ngx-charts-bar
+            [width]="bar.width"
+            [height]="bar.height"
+            [x]="bar.x"
+            [y]="bar.y"
+            [fill]="bar.color"
+            [stops]="bar.gradientStops"
+            [data]="bar.data"
+            [orientation]="barOrientation.Horizontal"
+            [roundEdges]="bar.roundEdges"
+            (select)="click($event)"
+            [gradient]="gradient"
+            [isActive]="isActive(bar.data)"
+            [ariaLabel]="bar.ariaLabel"
+            [animations]="animations"
+            (activate)="activate.emit($event)"
+            (deactivate)="deactivate.emit($event)"
+            ngx-tooltip
+            [tooltipDisabled]="tooltipDisabled"
+            [tooltipPlacement]="tooltipPlacement"
+            [tooltipType]="tooltipType"
+            [tooltipTitle]="tooltipTemplate ? undefined : bar.tooltipText"
+            [tooltipTemplate]="tooltipTemplate"
+            [tooltipContext]="bar.data"
+            [noBarWhenZero]="noBarWhenZero"
+          ></svg:g>
+        }
+      </svg:g>
     }
     @if (showDataLabel) {
       <svg:g>
@@ -76,7 +124,7 @@ import { ScaleType } from '../common/types/scale-type.enum';
   ],
   standalone: false
 })
-export class SeriesHorizontal implements OnChanges {
+export class SeriesHorizontal implements OnChanges, OnInit {
   @Input() dims: ViewDimensions;
   @Input() type: BarChartType = BarChartType.Standard;
   @Input() series: DataItem[];
@@ -105,6 +153,16 @@ export class SeriesHorizontal implements OnChanges {
   barsForDataLabels: Array<{ x: number; y: number; width: number; height: number; total: number; series: string }> = [];
 
   barOrientation = BarOrientation;
+
+  isSSR = false;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: any) {}
+
+  ngOnInit() {
+    if (isPlatformServer(this.platformId)) {
+      this.isSSR = true;
+    }
+  }
 
   ngOnChanges(): void {
     this.update();

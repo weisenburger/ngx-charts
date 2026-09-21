@@ -2,6 +2,42 @@
 
 ## HEAD (unreleased)
 
+## 25.0.2
+
+- Fix: SSR issues stemming from Angular update
+- Fix: Horizontal variant Y-axis labels were cut off, extended available characters for SSR
+
+## 25.0.1
+
+- Chore: Sync 25.x release with master (includes maintenance fixes already present on git that were missing from the original npm 25.0.0 publish)
+
+## 25.0.0
+
+- Enhancement: Added support for Angular 22
+- Breaking: Dropped support for Angular 19 and 20 (requires Angular 21.2+)
+
+## 24.0.2
+
+- Fix: Side legend labels now truncate with CSS ellipsis instead of being hard-clipped when the legend width is constrained
+
+## 24.0.1
+
+- Fix: Y-axis labels were cut off, misaligned when server-side rendered.
+
+## 24.0.0
+
+- Fix: Area Charts were not server-side renderable
+
+## 24.0.0-alpha.1
+
+- Fix: Area Charts were not server-side renderable
+
+## 24.0.0-alpha.0
+
+- Enhancement: Added support for Angular 21
+- Enhancement: Migration to vitest
+- Breaking: Removing support for Angular 18 and karma
+
 ## 23.1.0
 
 - Enhancement: Handle the label overflow inside the Sankey chart.
