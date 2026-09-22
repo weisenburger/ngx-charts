@@ -1,6 +1,6 @@
 {
   "name": "@wbds/ngx-charts",
-  "version": "25.0.2",
+  "version": "22.0.8",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
