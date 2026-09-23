@@ -14,12 +14,7 @@ const data = [
   standalone: true,
   imports: [NgxChartsModule],
   template: `
-    <ngx-charts-bar-vertical
-      [view]="[400, 300]"
-      [results]="data"
-      [xAxis]="true"
-      [yAxis]="true"
-      [animations]="false">
+    <ngx-charts-bar-vertical [view]="[400, 300]" [results]="data" [xAxis]="true" [yAxis]="true" [animations]="false">
       <ng-template #tooltipTemplate let-model="model">
         <span>{{ model.value }}</span>
       </ng-template>

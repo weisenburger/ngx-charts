@@ -22,6 +22,8 @@ import { ScaleType } from '../types/scale-type.enum';
       @if (showLegend && legendType === LegendType.ScaleLegend) {
         <ngx-charts-scale-legend
           class="chart-legend"
+          [style.width.px]="legendWidth"
+          [style.maxWidth.px]="legendWidth"
           [horizontal]="legendOptions && legendOptions.position === LegendPosition.Below"
           [valueRange]="legendOptions.domain"
           [colors]="legendOptions.colors"
@@ -33,6 +35,8 @@ import { ScaleType } from '../types/scale-type.enum';
       @if (showLegend && legendType === LegendType.Legend) {
         <ngx-charts-legend
           class="chart-legend"
+          [style.width.px]="legendWidth"
+          [style.maxWidth.px]="legendWidth"
           [horizontal]="legendOptions && legendOptions.position === LegendPosition.Below"
           [data]="legendOptions.domain"
           [title]="legendOptions.title"

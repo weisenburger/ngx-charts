@@ -13,6 +13,22 @@ import {
   Inject
 } from '@angular/core';
 import { trimLabel } from '../trim-label.helper';
+import {
+  CATEGORY_AXIS_INNER_TICK_SIZE,
+  CATEGORY_AXIS_LAYOUT_INSET,
+  CATEGORY_AXIS_MAX_WIDTH,
+  CATEGORY_AXIS_TICK_PADDING,
+  CATEGORY_AXIS_TRIM_CHAR_WIDTH,
+  CATEGORY_AXIS_VIEW_DIMS_SPACER,
+  CATEGORY_AXIS_Y_PADDING,
+  DEFAULT_CATEGORY_WRAP_MAX_LINES,
+  cappedCharsPerLine,
+  categoryLabelLeftFromLayout,
+  charsPerLine,
+  requiredCategoryAxisWidth,
+  resolveCategoryAxisLayout,
+  wrapCategoryLabel
+} from './category-axis-label.helper';
 import { getTickLines, reduceTicks } from './ticks.helper';
 import { roundedRect } from '../../common/shape.helper';
 import { isPlatformBrowser } from '@angular/common';
@@ -142,6 +158,10 @@ export class YAxisTicksComponent implements OnChanges, AfterViewInit {
   referenceLineLength: number = 0;
   referenceAreaPath: string;
 
+  /** Stable axis width for truncation/wrapping; never updated from DOM measurement. */
+  private layoutAxisWidth = 0;
+  private lastEmittedWidth: number | null = null;
+
   readonly Orientation = Orientation;
 
   @ViewChild('ticksel') ticksElement: ElementRef;
@@ -153,22 +173,17 @@ export class YAxisTicksComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => this.updateDims());
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => this.updateDims());
+    }
   }
 
   updateDims(): void {
-    if (!isPlatformBrowser(this.platformId)) {
-      // for SSR, use approximate value instead of measured
-      this.width = this.getApproximateAxisWidth();
-      this.dimensionsChanged.emit({ width: this.width });
-      return;
-    }
-
-    const width = parseInt(this.ticksElement.nativeElement.getBoundingClientRect().width, 10);
-    if (width !== this.width) {
+    const width = Math.min(this.getMeasuredAxisWidth(), CATEGORY_AXIS_MAX_WIDTH);
+    if (width > 0 && width !== this.lastEmittedWidth) {
+      this.lastEmittedWidth = width;
       this.width = width;
       this.dimensionsChanged.emit({ width });
-      setTimeout(() => this.updateDims());
     }
   }
 
@@ -193,9 +208,10 @@ export class YAxisTicksComponent implements OnChanges, AfterViewInit {
       };
     }
 
+    this.resolveLayoutAxisWidth();
+
     this.adjustedScale = scale.bandwidth
       ? d => {
-          // position the tick to middle considering number of lines of the tick
           const positionMiddle = scale(d) + scale.bandwidth() * 0.5;
           if (this.wrapTicks && d.toString().length > this.maxTickLength) {
             const chunksLength = this.tickChunks(d).length;
@@ -258,7 +274,31 @@ export class YAxisTicksComponent implements OnChanges, AfterViewInit {
         break;
       default:
     }
-    setTimeout(() => this.updateDims());
+
+    if (!isPlatformBrowser(this.platformId)) {
+      this.applySsrAxisLayout();
+    } else {
+      setTimeout(() => this.updateDims());
+    }
+  }
+
+  private resolveLayoutAxisWidth(): void {
+    if (!this.ticks?.length || !this.tickFormat) {
+      return;
+    }
+    const labels = this.ticks.map(t => String(this.tickFormat(t)));
+    const layout = YAxisTicksComponent.resolveAxisLayout(labels, this.trimTicks, this.maxTickLength, this.wrapTicks);
+    this.layoutAxisWidth = layout.yAxisWidth;
+  }
+
+  private applySsrAxisLayout(): void {
+    if (this.layoutAxisWidth > 0 && this.layoutAxisWidth !== this.lastEmittedWidth) {
+      this.lastEmittedWidth = this.layoutAxisWidth;
+      this.width = this.layoutAxisWidth;
+      this.dimensionsChanged.emit({ width: this.layoutAxisWidth });
+    } else if (this.layoutAxisWidth > 0) {
+      this.width = this.layoutAxisWidth;
+    }
   }
 
   setReferencelines(): void {
@@ -314,28 +354,132 @@ export class YAxisTicksComponent implements OnChanges, AfterViewInit {
   }
 
   tickTrim(label: string): string {
-    return this.trimTicks ? trimLabel(label, this.maxTickLength) : label;
+    if (!this.trimTicks) {
+      return label;
+    }
+    return trimLabel(label, this.getEffectiveMaxTickLength(label));
+  }
+
+  private getEffectiveMaxTickLength(label?: string): number {
+    if (this.orient !== Orientation.Left && this.orient !== Orientation.Right) {
+      return this.maxTickLength;
+    }
+    if (this.layoutAxisWidth <= 0) {
+      return this.maxTickLength;
+    }
+    return YAxisTicksComponent.effectiveMaxTickLength(this.layoutAxisWidth, this.maxTickLength, this.trimTicks, label);
+  }
+
+  static readonly Y_AXIS_PADDING = CATEGORY_AXIS_Y_PADDING;
+  static readonly VIEW_DIMS_Y_AXIS_SPACER = CATEGORY_AXIS_VIEW_DIMS_SPACER;
+  static readonly INNER_TICK_SIZE = CATEGORY_AXIS_INNER_TICK_SIZE;
+  static readonly TICK_PADDING = CATEGORY_AXIS_TICK_PADDING;
+  static readonly AXIS_LAYOUT_INSET = CATEGORY_AXIS_LAYOUT_INSET;
+  static readonly APPROX_CHAR_WIDTH = 6;
+  static readonly TRIM_CHAR_WIDTH = CATEGORY_AXIS_TRIM_CHAR_WIDTH;
+
+  static effectiveMaxTickLength(
+    yAxisWidth: number,
+    maxTickLength: number,
+    trimTicks: boolean = true,
+    label?: string
+  ): number {
+    if (!trimTicks || yAxisWidth <= 0) {
+      return maxTickLength;
+    }
+    const limit = charsPerLine(yAxisWidth);
+    if (limit <= 0) {
+      return maxTickLength;
+    }
+    if (label === undefined) {
+      return limit;
+    }
+    const labelLength = String(label).trim().length;
+    return labelLength > limit ? Math.max(0, limit - 3) : limit;
+  }
+
+  static approximateTickLabelsWidth(
+    labels: string[],
+    trimTicks: boolean = true,
+    maxTickLength: number = 16,
+    wrapTicks: boolean = true
+  ): number {
+    return YAxisTicksComponent.resolveAxisLayout(labels, trimTicks, maxTickLength, wrapTicks).yAxisWidth;
+  }
+
+  static resolveAxisLayout(
+    labels: string[],
+    trimTicks: boolean = true,
+    maxTickLength: number = 16,
+    wrapTicks: boolean = true
+  ): { yAxisWidth: number; maxTickLength: number } {
+    const layout = resolveCategoryAxisLayout(labels, trimTicks, wrapTicks);
+    return { yAxisWidth: layout.yAxisWidth, maxTickLength };
+  }
+
+  static requiredYAxisWidth(textWidth: number): number {
+    return requiredCategoryAxisWidth(textWidth);
+  }
+
+  static labelLeftFromLayout(marginsLeft: number, yAxisWidth: number, textWidth: number): number {
+    return categoryLabelLeftFromLayout(marginsLeft, yAxisWidth, textWidth);
   }
 
   getApproximateAxisWidth(): number {
-    const maxChars = Math.max(...this.ticks.map(t => this.tickTrim(this.tickFormat(t)).length));
-    const charWidth = 7;
-    return maxChars * charWidth;
+    if (!this.ticks?.length || !this.tickFormat) {
+      return 0;
+    }
+    const labels = this.ticks.map(t => String(this.tickFormat(t)));
+    return YAxisTicksComponent.resolveAxisLayout(labels, this.trimTicks, this.maxTickLength, this.wrapTicks).yAxisWidth;
+  }
+
+  private getMeasuredAxisWidth(): number {
+    if (!isPlatformBrowser(this.platformId)) {
+      return this.getApproximateAxisWidth();
+    }
+
+    if (!this.ticksElement?.nativeElement) {
+      return 0;
+    }
+
+    const bboxWidth = parseInt(this.ticksElement.nativeElement.getBoundingClientRect().width, 10);
+    const tickSpacing = this.tickSpacing ?? YAxisTicksComponent.INNER_TICK_SIZE + YAxisTicksComponent.TICK_PADDING;
+    const textWidth = Math.max(0, bboxWidth - tickSpacing);
+    return YAxisTicksComponent.requiredYAxisWidth(textWidth);
   }
 
   tickChunks(label: string): string[] {
-    if (label.toString().length > this.maxTickLength && this.scale.bandwidth) {
-      // for y-axis the width of the tick is fixed
-      const preferredWidth = this.maxTickLength;
-      const maxLines = Math.floor(this.scale.bandwidth() / 15);
+    const formatted = String(this.tickFormat(label));
 
-      if (maxLines <= 1) {
-        return [this.tickTrim(label)];
+    if (this.orient === Orientation.Left || this.orient === Orientation.Right) {
+      if (!this.wrapTicks || !this.scale.bandwidth) {
+        return [this.tickTrim(formatted)];
       }
 
-      return getTickLines(label, preferredWidth, Math.min(maxLines, 5));
+      const maxLines = Math.min(Math.floor(this.scale.bandwidth() / 15), DEFAULT_CATEGORY_WRAP_MAX_LINES);
+      if (maxLines <= 1) {
+        return [this.tickTrim(formatted)];
+      }
+
+      const perLine = cappedCharsPerLine(
+        this.layoutAxisWidth > 0 ? charsPerLine(this.layoutAxisWidth) : this.getEffectiveMaxTickLength(formatted)
+      );
+      if (perLine <= 0 || formatted.length <= perLine) {
+        return [formatted];
+      }
+
+      const lines = wrapCategoryLabel(formatted, perLine, maxLines, this.trimTicks);
+      return lines.length > 1 ? lines : [this.tickTrim(formatted)];
     }
 
-    return [this.tickFormat(label)];
+    if (formatted.length > this.maxTickLength && this.scale.bandwidth) {
+      const maxLines = Math.floor(this.scale.bandwidth() / 15);
+      if (maxLines <= 1) {
+        return [this.tickTrim(formatted)];
+      }
+      return getTickLines(formatted, this.maxTickLength, Math.min(maxLines, DEFAULT_CATEGORY_WRAP_MAX_LINES));
+    }
+
+    return [formatted];
   }
 }

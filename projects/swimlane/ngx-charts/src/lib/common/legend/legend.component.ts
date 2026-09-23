@@ -28,7 +28,13 @@ export interface LegendEntry {
         </header>
       }
       <div class="legend-wrap">
-        <ul class="legend-labels" [class.horizontal-legend]="horizontal" [style.max-height.px]="height - 45">
+        <ul
+          class="legend-labels"
+          [class.horizontal-legend]="horizontal"
+          [class.vertical-legend]="!horizontal"
+          [style.max-height.px]="!horizontal ? height - 45 : null"
+          [style.max-width.px]="horizontal && width ? width - 10 : null"
+        >
           @for (entry of legendEntries; track entry.label) {
             <li class="legend-label">
               <ngx-charts-legend-entry

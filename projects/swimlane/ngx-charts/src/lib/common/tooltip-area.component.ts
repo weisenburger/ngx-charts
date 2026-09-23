@@ -7,11 +7,12 @@ import {
   ChangeDetectionStrategy,
   TemplateRef,
   PLATFORM_ID,
-  Inject
+  Inject,
+  OnInit
 } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { createMouseEvent } from '../events';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { ColorHelper } from '../common/color.helper';
 import { PlacementTypes } from './tooltip/position';
 import { StyleTypes } from './tooltip/style.type';
@@ -53,25 +54,46 @@ export interface Tooltip {
           }
         </xhtml:div>
       </ng-template>
-      <svg:rect
-        #tooltipAnchor
-        [@animationState]="anchorOpacity !== 0 ? 'active' : 'inactive'"
-        class="tooltip-anchor"
-        [attr.x]="anchorPos"
-        y="0"
-        [attr.width]="1"
-        [attr.height]="dims.height"
-        [style.opacity]="anchorOpacity"
-        [style.pointer-events]="'none'"
-        ngx-tooltip
-        [tooltipDisabled]="tooltipDisabled"
-        [tooltipPlacement]="placementTypes.Right"
-        [tooltipType]="styleTypes.tooltip"
-        [tooltipSpacing]="15"
-        [tooltipTemplate]="tooltipTemplate ? tooltipTemplate : defaultTooltipTemplate"
-        [tooltipContext]="anchorValues"
-        [tooltipImmediateExit]="true"
-      />
+      @if (!isSSR) {
+        <svg:rect
+          #tooltipAnchor
+          [@animationState]="anchorOpacity !== 0 ? 'active' : 'inactive'"
+          class="tooltip-anchor"
+          [attr.x]="anchorPos"
+          y="0"
+          [attr.width]="1"
+          [attr.height]="dims.height"
+          [style.opacity]="anchorOpacity"
+          [style.pointer-events]="'none'"
+          ngx-tooltip
+          [tooltipDisabled]="tooltipDisabled"
+          [tooltipPlacement]="placementTypes.Right"
+          [tooltipType]="styleTypes.tooltip"
+          [tooltipSpacing]="15"
+          [tooltipTemplate]="tooltipTemplate ? tooltipTemplate : defaultTooltipTemplate"
+          [tooltipContext]="anchorValues"
+          [tooltipImmediateExit]="true"
+        />
+      } @else {
+        <svg:rect
+          #tooltipAnchor
+          class="tooltip-anchor"
+          [attr.x]="anchorPos"
+          y="0"
+          [attr.width]="1"
+          [attr.height]="dims.height"
+          [style.opacity]="anchorOpacity"
+          [style.pointer-events]="'none'"
+          ngx-tooltip
+          [tooltipDisabled]="tooltipDisabled"
+          [tooltipPlacement]="placementTypes.Right"
+          [tooltipType]="styleTypes.tooltip"
+          [tooltipSpacing]="15"
+          [tooltipTemplate]="tooltipTemplate ? tooltipTemplate : defaultTooltipTemplate"
+          [tooltipContext]="anchorValues"
+          [tooltipImmediateExit]="true"
+        />
+      }
     </svg:g>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,7 +115,7 @@ export interface Tooltip {
   ],
   standalone: false
 })
-export class TooltipArea {
+export class TooltipArea implements OnInit {
   anchorOpacity: number = 0;
   anchorPos: number = -1;
   anchorValues: Tooltip[] = [];
@@ -116,7 +138,15 @@ export class TooltipArea {
 
   @ViewChild('tooltipAnchor', { static: false }) tooltipAnchor;
 
+  isSSR = false;
+
   constructor(@Inject(PLATFORM_ID) private platformId: any) {}
+
+  ngOnInit() {
+    if (isPlatformServer(this.platformId)) {
+      this.isSSR = true;
+    }
+  }
 
   getValues(xVal): Tooltip[] {
     const results = [];
