@@ -58,7 +58,7 @@
     "d3-transition": "^3.0.1",
     "emoji-flags": "^1.2.0",
     "moment-timezone": "^0.5.40",
-    "ng-in-viewport": "13.0.1",
+    "ng-in-viewport": "13.0.0",
     "ngx-moment": "^5.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "rxjs": "^7.8.1",
@@ -108,9 +108,29 @@
     "vitest": "^4.0.8",
     "webpack": "5"
   },
+  "overrides": {
+    "ng-in-viewport": {
+      "@angular/platform-browser": "$@angular/platform-browser"
+    },
+    "ngx-autosize-input": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    },
+    "@swimlane/prettier-config-swimlane": {
+      "prettier": "$prettier"
+    },
+    "ng2-file-upload": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    }
+  },
   "volta": {
     "node": "24.18.0",
-    "yarn": "4.9.2"
+    "npm": "11.21.0"
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "npm@11.21.0",
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0",
+    "npm": ">=11"
+  }
 }
