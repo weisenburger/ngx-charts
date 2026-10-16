@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          # Node-Version kommt aus package.json (volta.node)
+          node-version-file: package.json
+          cache: npm
+
+      - name: Install npm (packageManager)
+        run: npm install -g "$(node -p "require('./package.json').packageManager")"
+
+      # Ohne --legacy-peer-deps: Peer-Konflikte lassen den Install scheitern
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run prettier:ci
+
+      - name: Unit tests
+        run: npm run test:ci
+
+      - name: Build library
+        run: npm run package
+
+      - name: Build demo app
+        run: npx ng build --configuration production
+
+      - name: Pack library
+        run: npm pack ./dist/wbds/ngx-charts --pack-destination ./dist
+
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: ngx-charts-package
+          path: dist/*.tgz
+          retention-days: 7
